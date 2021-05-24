@@ -25,7 +25,7 @@
 #include <sys/mman.h>
 #include <sys/stat.h>
 #include <unistd.h>
-
+#include <sys/socket.h>
 #include "Config.h"
 #include "Shadow.h"
 #include <Runtime.h>
@@ -123,6 +123,100 @@ int SYM(open)(const char *path, int oflag, mode_t mode) {
 
   return result;
 }
+
+int SYM(accept)(int sockfd, struct sockaddr* addr, socklen_t* addrlen) {
+  auto result = accept(sockfd, addr, addrlen);
+  _sym_set_return_expression(nullptr);
+
+  // std::cout << "intercepting accept \n";
+  if (result >= 0 && !g_config.fullyConcrete && !g_config.inputFile.empty()){
+    if (inputFileDescriptor != -1)
+      std::cerr << "Warning: input file opened multiple times; this is not yet "
+                   "supported"
+                << std::endl;
+    inputFileDescriptor = result;
+    // std::cout << "inputFileDescriptor: " << inputFileDescriptor << std::endl;
+    inputOffset = 0;
+  }
+
+  return result;
+}
+
+int SYM(accept4)(int sockfd, struct sockaddr* addr, socklen_t* addrlen, int flags) {
+  auto result = accept4(sockfd, addr, addrlen, flags);
+  _sym_set_return_expression(nullptr);
+
+  // std::cout << "intercepting accept4 \n";
+  if (result >= 0 && !g_config.fullyConcrete && !g_config.inputFile.empty()){
+    if (inputFileDescriptor != -1)
+      std::cerr << "Warning: input file opened multiple times; this is not yet "
+                   "supported"
+                << std::endl;
+    inputFileDescriptor = result;
+    // std::cout << "inputFileDescriptor: " << inputFileDescriptor << std::endl;
+    inputOffset = 0;
+  }
+
+  return result;
+}
+
+ssize_t SYM(recv)(int sockfd, void *buf, size_t len, int flags) {
+  tryAlternative(buf, _sym_get_parameter_expression(1), SYM(recv));
+  tryAlternative(len, _sym_get_parameter_expression(2), SYM(recv));
+
+  auto result = recv(sockfd, buf, len, flags);
+  _sym_set_return_expression(nullptr);
+
+  if (result < 0)
+    return result;
+
+  if (sockfd == inputFileDescriptor) {
+    // Reading symbolic input.
+    ReadWriteShadow shadow(buf, result);
+    std::generate(shadow.begin(), shadow.end(),
+                  []() { return _sym_get_input_byte(inputOffset++); });
+  } else if (!isConcrete(buf, result)) {
+    ReadWriteShadow shadow(buf, result);
+    std::fill(shadow.begin(), shadow.end(), nullptr);
+  }
+
+  return result;
+}
+
+ssize_t SYM(recvfrom)(int sockfd, void* buf, size_t len, int flags, struct sockaddr* src_addr, socklen_t* addrlen) {
+  tryAlternative(buf, _sym_get_parameter_expression(1), SYM(recvfrom));
+  tryAlternative(len, _sym_get_parameter_expression(2), SYM(recvfrom));
+  tryAlternative(src_addr, _sym_get_parameter_expression(3), SYM(recvfrom));
+  tryAlternative(addrlen, _sym_get_parameter_expression(4), SYM(recvfrom));
+
+  auto result = recvfrom(sockfd, buf, len, flags, src_addr, addrlen);
+  _sym_set_return_expression(nullptr);
+
+  if (result < 0)
+    return result;
+
+  if (sockfd == inputFileDescriptor) {
+    // Reading symbolic input.
+    ReadWriteShadow shadow(buf, result);
+    std::generate(shadow.begin(), shadow.end(),
+                  []() { return _sym_get_input_byte(inputOffset++); });
+  } else if (!isConcrete(buf, result)) {
+    ReadWriteShadow shadow(buf, result);
+    std::fill(shadow.begin(), shadow.end(), nullptr);
+  }
+
+  return result;
+}
+
+ssize_t SYM(recvmsg)(int sockfd, struct msghdr *msg, int flags) {
+  std::cerr << "Error: symbolic input from recvmsg this is not yet supported" << std::endl;
+  exit(-1);
+
+  auto result = recvmsg(sockfd, msg, flags);
+
+  return result;
+}
+
 
 ssize_t SYM(read)(int fildes, void *buf, size_t nbyte) {
   tryAlternative(buf, _sym_get_parameter_expression(1), SYM(read));
