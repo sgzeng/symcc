@@ -41,6 +41,22 @@ bool checkFlagString(std::string value) {
 Config g_config;
 
 void loadConfig() {
+  auto *delimiter = getenv("MAZERUNNER_DELIMITER");
+  if (delimiter != nullptr)
+    g_config.delimiter = checkFlagString(delimiter);
+
+  auto *skipEpisodeNum = getenv("MAZERUNNER_SKIP_EPISODE_NUM");
+  if (skipEpisodeNum != nullptr)
+    g_config.skipEpisodeNum = checkFlagString(skipEpisodeNum);
+
+  auto *targetBA = getenv("MAZERUNNER_TARGET_BRANCHACTION");
+  if (targetBA != nullptr)
+    g_config.targetBA = checkFlagString(targetBA);
+
+  auto *pkglen = getenv("MAZERUNNER_PACKAGE_LENGTH");
+  if (pkglen != nullptr)
+    g_config.pkglen = checkFlagString(pkglen);
+
   auto *fullyConcrete = getenv("SYMCC_NO_SYMBOLIC_INPUT");
   if (fullyConcrete != nullptr)
     g_config.fullyConcrete = checkFlagString(fullyConcrete);

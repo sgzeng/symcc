@@ -36,9 +36,9 @@ RUN apt-get update \
 RUN pip3 install lit
 
 # Build AFL.
-RUN git clone -b v2.56b https://github.com/google/AFL.git afl \
-    && cd afl \
-    && make
+# RUN git clone -b v2.56b https://github.com/google/AFL.git afl \
+#     && cd afl \
+#     && make
 
 # Download the LLVM sources already so that we don't need to get them again when
 # SymCC changes
@@ -96,6 +96,15 @@ FROM ubuntu:20.04
 
 RUN apt-get update \
     && DEBIAN_FRONTEND=noninteractive apt-get install -y \
+        git \
+        apt-utils \
+        openssl \
+        graphviz-dev \
+        libgnutls28-dev \
+        python3-pip \
+        vim \
+        net-tools \
+        netcat \
         build-essential \
         clang-10 \
         g++ \
@@ -122,3 +131,30 @@ USER ubuntu
 WORKDIR /home/ubuntu
 COPY sample.cpp /home/ubuntu/
 RUN mkdir /tmp/output
+ENV WORKDIR="/home/ubuntu/"
+ENV AFLNET="/home/ubuntu/aflnet"
+
+# RUN cd ${WORKDIR} && \
+#     git clone https://github.com/profuzzbench/aflnet.git
+#     # cd aflnet && \
+#     # make clean all && \
+#     # cd llvm_mode && make
+
+# RUN cd ${WORKDIR} && \
+#     git clone https://github.com/profuzzbench/profuzzbench.git
+
+# RUN cd ${WORKDIR} && \
+#     git clone https://github.com/hfiref0x/LightFTP.git && \
+#     cd LightFTP && \
+#     git checkout 5980ea1 && \
+#     patch -p1 < ${WORKDIR}/profuzzbench/subjects/FTP/LightFTP/fuzzing.patch && \
+#     cd Source/Release && \
+#     CC=symcc make clean all
+
+# # Set up LightFTP for fuzzing
+# RUN cd ${WORKDIR}/LightFTP/Source/Release && \
+#     cp ${AFLNET}/tutorials/lightftp/fftp.conf ./ && \
+#     cp ${AFLNET}/tutorials/lightftp/ftpclean.sh ./ && \
+#     cp -r ${AFLNET}/tutorials/lightftp/certificate /home/ubuntu && \
+#     mkdir ${WORKDIR}/ftpshare && \
+#     cp -r ${WORKDIR}/profuzzbench/subjects/FTP/LightFTP/in-ftp ${WORKDIR}/LightFTP/Source/Release
