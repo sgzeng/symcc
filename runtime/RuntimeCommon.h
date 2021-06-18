@@ -158,7 +158,7 @@ SymExpr _sym_build_extract(SymExpr expr, uint64_t offset, uint64_t length,
 /*
  * Call-stack tracing
  */
-void _sym_notify_call(uintptr_t site_id);
+void _sym_notify_call(uintptr_t ret_addr, uintptr_t target_addr);
 void _sym_notify_ret(uintptr_t site_id);
 void _sym_notify_basic_block(uintptr_t site_id);
 

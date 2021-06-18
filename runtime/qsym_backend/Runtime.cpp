@@ -172,8 +172,7 @@ void _sym_initialize(void) {
   }
 
   g_z3_context = new z3::context{};
-  g_solver =
-      new Solver(inputFileName, g_config.outputDir, g_config.aflCoverageMap, g_config.delimiter, g_config.skipEpisodeNum, g_config.targetBA, g_config.pkglen);
+  g_solver = new Solver(inputFileName, g_config.outputDir, g_config.aflCoverageMap, g_config.delimiter, g_config.skipEpisodeNum, g_config.targetBA, g_config.pkglen);
   g_expr_builder = g_config.pruning ? PruneExprBuilder::create()
                                     : SymbolicExprBuilder::create();
 }
@@ -352,8 +351,8 @@ UNSUPPORTED(SymExpr _sym_build_float_to_unsigned_integer(SymExpr, uint8_t))
 // Call-stack tracing
 //
 
-void _sym_notify_call(uintptr_t site_id) {
-  g_call_stack_manager.visitCall(site_id);
+void _sym_notify_call(uintptr_t ret_addr, uintptr_t target_addr) {
+  g_call_stack_manager.visitCall(ret_addr, target_addr);
 }
 
 void _sym_notify_ret(uintptr_t site_id) {

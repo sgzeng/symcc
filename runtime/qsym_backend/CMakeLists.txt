@@ -38,6 +38,9 @@ find_package(LLVM REQUIRED CONFIG)
 add_definitions(${LLVM_DEFINITIONS})
 include_directories(SYSTEM ${LLVM_INCLUDE_DIRS})
 
+# find_package(hiredis REQUIRED CONFIG)
+# include_directories(SYSTEM ${HIREDIS_INCLUDE_DIRS})
+
 # Qsym doesn't work with old versions of Z3
 find_package(Z3 4.5 CONFIG)
 if (NOT Z3_FOUND)

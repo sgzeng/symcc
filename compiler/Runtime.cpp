@@ -150,7 +150,7 @@ Runtime::Runtime(Module &M) {
   buildExtract = import(M, "_sym_build_extract", ptrT, ptrT, IRB.getInt64Ty(),
                         IRB.getInt64Ty(), int8T);
 
-  notifyCall = import(M, "_sym_notify_call", voidT, intPtrType);
+  notifyCall = import(M, "_sym_notify_call", voidT, intPtrType, intPtrType);
   notifyRet = import(M, "_sym_notify_ret", voidT, intPtrType);
   notifyBasicBlock = import(M, "_sym_notify_basic_block", voidT, intPtrType);
 }

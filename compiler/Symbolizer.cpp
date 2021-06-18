@@ -311,10 +311,19 @@ void Symbolizer::handleFunctionCall(CallBase &I, Instruction *returnPoint) {
   IRBuilder<> IRB(returnPoint);
   IRB.CreateCall(runtime.notifyRet, getTargetPreferredInt(&I));
   IRB.SetInsertPoint(&I);
-  IRB.CreateCall(runtime.notifyCall, getTargetPreferredInt(&I));
 
-  if (callee == nullptr)
+  std::vector<Value *> args;
+  args.push_back(getTargetPreferredInt(&I));
+  if (callee == nullptr){
+    args.push_back(getTargetPreferredInt(&I));
+    ArrayRef<Value *> args_ref(args);
+    IRB.CreateCall(runtime.notifyCall, args_ref);
     tryAlternative(IRB, I.getCalledOperand());
+  }else{
+    args.push_back(callee);
+    ArrayRef<Value *> args_ref(args);
+    IRB.CreateCall(runtime.notifyCall, args_ref);
+  }
 
   for (Use &arg : I.args())
     IRB.CreateCall(runtime.setParameterExpression,
