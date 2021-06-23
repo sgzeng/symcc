@@ -29,8 +29,12 @@
 #include "Config.h"
 #include "Shadow.h"
 #include <Runtime.h>
+// #include "LibcWrappers.h"
 
 #define SYM(x) x##_symbolized
+
+typedef uint64_t UINT64;            ///< 64-bit unsigned integer
+UINT64       currOffset;
 
 namespace {
 
@@ -66,6 +70,7 @@ void initLibcWrappers() {
     // Symbolic data comes from standard input.
     inputFileDescriptor = 0;
   }
+  currOffset = 0;
 }
 
 extern "C" {
@@ -179,7 +184,7 @@ ssize_t SYM(recv)(int sockfd, void *buf, size_t len, int flags) {
     ReadWriteShadow shadow(buf, result);
     std::fill(shadow.begin(), shadow.end(), nullptr);
   }
-
+  currOffset += (UINT64)result;
   return result;
 }
 
@@ -204,7 +209,7 @@ ssize_t SYM(recvfrom)(int sockfd, void* buf, size_t len, int flags, struct socka
     ReadWriteShadow shadow(buf, result);
     std::fill(shadow.begin(), shadow.end(), nullptr);
   }
-
+  currOffset += (UINT64)result;
   return result;
 }
 
@@ -213,7 +218,7 @@ ssize_t SYM(recvmsg)(int sockfd, struct msghdr *msg, int flags) {
   exit(-1);
 
   auto result = recvmsg(sockfd, msg, flags);
-
+  currOffset += (UINT64)result;
   return result;
 }
 
@@ -237,7 +242,7 @@ ssize_t SYM(read)(int fildes, void *buf, size_t nbyte) {
     ReadWriteShadow shadow(buf, result);
     std::fill(shadow.begin(), shadow.end(), nullptr);
   }
-
+  currOffset += (UINT64)result;
   return result;
 }
 

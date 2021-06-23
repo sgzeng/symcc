@@ -57,6 +57,10 @@ void loadConfig() {
   // if (pkglen != nullptr)
   //   g_config.pkglen = (pkglen);
 
+  // auto *dbNum = getenv("MAZERUNNER_redis_dbNum");
+  // if (dbNum != nullptr)
+  //   g_config.dbNum = dbNum;
+
   auto *fullyConcrete = getenv("SYMCC_NO_SYMBOLIC_INPUT");
   if (fullyConcrete != nullptr)
     g_config.fullyConcrete = checkFlagString(fullyConcrete);

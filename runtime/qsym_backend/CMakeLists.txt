@@ -69,6 +69,8 @@ add_library(SymRuntime SHARED
   ${QSYM_SOURCE_DIR}/afl_trace_map.cpp
   ${QSYM_SOURCE_DIR}/allocation.cpp
   ${QSYM_SOURCE_DIR}/call_stack_manager.cpp
+  ${QSYM_SOURCE_DIR}/loop.cpp
+  ${QSYM_SOURCE_DIR}/json.hpp
   ${QSYM_SOURCE_DIR}/third_party/llvm/range.cpp
   ${QSYM_SOURCE_DIR}/third_party/xxhash/xxhash.cpp
   ${SHARED_RUNTIME_SOURCES}

@@ -19,10 +19,13 @@
 
 struct Config {
   /// delimiter to seperate packages from the whole input
-  UINT8 delimiter = 0x0a;
+  uint8_t delimiter = 0x0a;
 
   /// how many episodes to skip
   int skipEpisodeNum = 0;
+
+  // redis db numer
+  int dbNum = 0;
 
   /// target branch address and action to reach after restart
   std::string targetBA = "0_0";

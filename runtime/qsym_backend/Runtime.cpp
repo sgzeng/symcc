@@ -53,6 +53,9 @@
 #include <call_stack_manager.h>
 #include <expr_builder.h>
 #include <solver.h>
+#include <json.hpp>
+#include <loop.h>
+#include <hiredis/hiredis.h>
 
 // LLVM
 #include <llvm/ADT/APInt.h>
@@ -69,6 +72,98 @@ ExprBuilder *g_expr_builder;
 Solver *g_solver;
 CallStackManager g_call_stack_manager;
 z3::context *g_z3_context;
+
+  // Memory                                  g_memory;
+  // REG                                     g_thread_context_reg;
+  std::map<ADDRINT, std::vector<Loop>>    all_loops;
+  std::set<ADDRINT>                       all_BBs;
+  std::vector<ADDRINT>                    error_pc_list;
+  std::set<UINT64>                        unique_episodes_set;
+  redisContext                            *redis_clt;
+  std::ofstream                           outfile;
+  std::random_device                      rd;
+  std::mt19937_64                         eng(rd());
+
+using json = nlohmann::json;
+void initialize_CFG() {
+  try{
+    std::ifstream l_json("loops.json");
+    json j;
+    l_json >> j;
+    all_loops = j.get<std::map<ADDRINT, std::vector<qsym::Loop>>>();
+    l_json.close();
+  }
+  catch (...){
+    outfile << "cannot parse loops.json" << std::endl;
+  }
+  try{
+    std::ifstream b_json("bb.json");
+    json bbs;
+    b_json >> bbs;
+    all_BBs = bbs.get<std::set<ADDRINT>>();
+    b_json.close();
+  }
+  catch (...){
+    outfile << "cannot parse bb.json" << std::endl;
+  }
+
+  try{
+    std::ifstream e_json("error_pc.json");
+    json e_pc;
+    e_json >> e_pc;
+    error_pc_list = e_pc.get<std::vector<ADDRINT>>();
+    e_json.close();
+  }
+  catch (...){
+    outfile << "cannot parse error_pc.json" << std::endl;
+  }
+
+  try {
+    std::ifstream ue_json("unique_episodes.json");
+    json unique_episodes;
+    ue_json >> unique_episodes;
+    unique_episodes_set = unique_episodes.get<std::set<UINT64>>();
+    ue_json.close();
+  }
+  catch (...){
+    outfile << "cannot parse unique_episodes.json, creating a new one" << std::endl;
+    std::string json_str = "[";
+    json_str += "]";
+    json j = json::parse(json_str);
+    std::ofstream o("unique_episodes.json", std::ios_base::out);
+    o << std::setw(4) << j << std::endl;
+    o.close();
+  }
+
+}
+
+void initialize_log(){
+  outfile.open((g_config.outputDir) + "/rl.log", std::ios_base::app);
+  if(!outfile.is_open())
+    LOG_FATAL("Cannot create output file at " + (g_config.outputDir)+ "/rl.log");
+
+  if(g_config.skipEpisodeNum < 0 && g_config.targetBA != "follow"){
+    outfile << std::endl << "#########################" << std::endl;
+  }
+}
+
+void initialize_redis(){
+  struct timeval timeout = { 1, 500000 }; // 1.5 seconds
+  redis_clt = redisConnectWithTimeout("127.0.0.1", 6379, timeout);
+  if (redis_clt == NULL || redis_clt->err) {
+    redisFree(redis_clt);
+    LOG_FATAL("Redis connection error");
+  }
+  redisReply *reply;
+  reply = (redisReply *) redisCommand(redis_clt, "SELECT %d", g_config.dbNum);
+  if(reply == NULL || reply->type == REDIS_REPLY_ERROR){
+    LOG_FATAL("select redis db reply error");
+  }
+  if(reply != NULL){
+    freeReplyObject(reply);
+    reply = NULL;
+  }
+}
 
 } // namespace qsym
 
@@ -170,7 +265,9 @@ void _sym_initialize(void) {
     std::cerr << "Making data read from " << inputFileName << " as symbolic"
               << std::endl;
   }
-
+  initialize_log();
+  initialize_CFG();
+  initialize_redis();
   g_z3_context = new z3::context{};
   g_solver = new Solver(inputFileName, g_config.outputDir, g_config.aflCoverageMap, g_config.delimiter, g_config.skipEpisodeNum, g_config.targetBA, g_config.pkglen);
   g_expr_builder = g_config.pruning ? PruneExprBuilder::create()

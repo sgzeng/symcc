@@ -60,6 +60,7 @@ exec $compiler                                  \
      "$@"                                       \
      $stdlib_ldflags                            \
      -L"$runtime_dir"                           \
+     -lhiredis                                  \
      -lSymRuntime                               \
      -Wl,-rpath,"$runtime_dir"                  \
      -Qunused-arguments
