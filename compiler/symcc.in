@@ -42,6 +42,7 @@ exec $compiler                                  \
      -Xclang -load -Xclang "$pass"              \
      "$@"                                       \
      -L"$runtime_dir"                           \
+     -L"/usr/local/lib"				\
      -lhiredis                                  \
      -lSymRuntime                               \
      -Wl,-rpath,"$runtime_dir"                  \
