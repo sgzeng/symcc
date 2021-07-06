@@ -163,6 +163,11 @@ void _sym_notify_ret(uintptr_t site_id);
 void _sym_notify_basic_block(uintptr_t site_id);
 
 /*
+ * indirect jmp and call handling
+ */
+void _sym_notify_jmp(uint64_t target_addr);
+
+/*
  * Debugging
  */
 const char *_sym_expr_to_string(SymExpr expr); // statically allocated

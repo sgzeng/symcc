@@ -364,6 +364,28 @@ void _sym_notify_basic_block(uintptr_t site_id) {
   g_call_stack_manager.visitBasicBlock(site_id);
 }
 
+// 
+// Indirect jmp and call handling 
+// 
+void _sym_notify_jmp(uint64_t target_addr) {
+  std::cerr << "jmp into target: 0x" << hexstr(target_addr) << std::endl;
+  // ExprRef e = g_memory.getExprFromMem(addr, size);
+  // if (index != REG_INVALID_){
+  //   ExprRef ei = thread_ctx->getExprFromReg(ctx, index);
+  //   if (ei != NULL){
+  //     llvm::APInt val_i = getRegValue(ctx, index);
+  //     g_solver->solveAll(ei, val_i);
+  //     thread_ctx->clearExprFromReg(index);
+  //   }
+  // }
+  // if (e != NULL) {
+  //   LOG_DEBUG("Symbolic jmp: " + e->toString() + "\n");
+  //   llvm::APInt val = getMemValue(addr, size);
+  //   g_solver->solveAll(e, val);
+  //   g_memory.clearExprFromMem(addr, size);
+  // }
+}
+
 //
 // Debugging
 //

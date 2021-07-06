@@ -493,6 +493,9 @@ void _sym_notify_call(uintptr_t) {}
 void _sym_notify_ret(uintptr_t) {}
 void _sym_notify_basic_block(uintptr_t) {}
 
+/* No indirect jmp and call handling */
+void _sym_notify_jmp(uint64_t) {}
+
 /* Debugging */
 const char *_sym_expr_to_string(SymExpr expr) {
   return Z3_ast_to_string(g_context, expr);

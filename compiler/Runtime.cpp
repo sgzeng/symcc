@@ -152,6 +152,7 @@ Runtime::Runtime(Module &M) {
 
   notifyCall = import(M, "_sym_notify_call", voidT, intPtrType);
   notifyRet = import(M, "_sym_notify_ret", voidT, intPtrType);
+  notifyJmp = import(M, "_sym_notify_jmp", voidT, int8T);
   notifyBasicBlock = import(M, "_sym_notify_basic_block", voidT, intPtrType);
 }
 
