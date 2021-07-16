@@ -368,7 +368,7 @@ void _sym_notify_basic_block(uintptr_t site_id) {
 // Indirect jmp and call handling 
 // 
 void _sym_notify_jmp(uint64_t target_addr) {
-  std::cerr << "jmp into target: 0x" << hexstr(target_addr) << std::endl;
+  // std::cerr << "jmp into target: 0x" << hexstr(target_addr) << std::endl;
   // ExprRef e = g_memory.getExprFromMem(addr, size);
   // if (index != REG_INVALID_){
   //   ExprRef ei = thread_ctx->getExprFromReg(ctx, index);
