@@ -76,7 +76,6 @@ z3::context *g_z3_context;
   // Memory                                  g_memory;
   // REG                                     g_thread_context_reg;
   std::map<ADDRINT, std::vector<Loop>>    all_loops;
-  std::set<ADDRINT>                       all_BBs;
   std::vector<ADDRINT>                    error_pc_list;
   std::set<UINT64>                        unique_episodes_set;
   redisContext                            *redis_clt;
@@ -95,16 +94,6 @@ void initialize_CFG() {
   }
   catch (...){
     outfile << "cannot parse loops.json" << std::endl;
-  }
-  try{
-    std::ifstream b_json("bb.json");
-    json bbs;
-    b_json >> bbs;
-    all_BBs = bbs.get<std::set<ADDRINT>>();
-    b_json.close();
-  }
-  catch (...){
-    outfile << "cannot parse bb.json" << std::endl;
   }
 
   try{
