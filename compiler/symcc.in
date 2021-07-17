@@ -19,6 +19,7 @@ runtime_32bit_dir="${SYMCC_RUNTIME32_DIR:-@SYM_RUNTIME_32BIT_DIR@}"
 pass="${SYMCC_PASS_DIR:-@CMAKE_CURRENT_BINARY_DIR@}/libSymbolize.so"
 compiler="${SYMCC_CLANG:-@CLANG_BINARY@}"
 
+export LD_LIBRARY_PATH=/usr/local/lib/:$LD_LIBRARY_PATH
 # Find out if we're cross-compiling for a 32-bit architecture
 runtime_dir="$runtime_64bit_dir"
 for arg in "$@"; do
@@ -42,7 +43,6 @@ exec $compiler                                  \
      -Xclang -load -Xclang "$pass"              \
      "$@"                                       \
      -L"$runtime_dir"                           \
-     -L"/usr/local/lib"				\
      -lhiredis                                  \
      -lSymRuntime                               \
      -Wl,-rpath,"$runtime_dir"                  \

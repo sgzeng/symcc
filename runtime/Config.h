@@ -28,7 +28,7 @@ struct Config {
   int dbNum = 0;
 
   /// target branch address and action to reach after restart
-  std::string targetBA = "0_0";
+  std::string targetBA = "follow";
   
   /// package length
   int pkglen = 0;

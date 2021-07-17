@@ -75,7 +75,7 @@ endif()
 add_definitions(${LLVM_DEFINITIONS})
 include_directories(SYSTEM ${LLVM_INCLUDE_DIRS})
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17 \
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++20 \
 -Wredundant-decls -Wcast-align -Wmissing-include-dirs -Wswitch-default \
 -Wextra -Wall -Winvalid-pch -Wredundant-decls -Wformat=2 \
 -Wmissing-format-attribute -Wformat-nonliteral -Werror")
