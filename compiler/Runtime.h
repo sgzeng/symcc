@@ -61,6 +61,7 @@ struct Runtime {
   SymFnT readMemory{};
   SymFnT writeMemory{};
   SymFnT buildExtract{};
+  SymFnT buildInsert{};
   SymFnT notifyCall{};
   SymFnT notifyRet{};
   SymFnT notifyBasicBlock{};
