@@ -41,25 +41,26 @@ bool checkFlagString(std::string value) {
 Config g_config;
 
 void loadConfig() {
-  // auto *delimiter = getenv("MAZERUNNER_DELIMITER");
-  // if (delimiter != nullptr)
-  //   g_config.delimiter = (delimiter);
+  auto *deli = getenv("MAZERUNNER_DELIMITER");
+  char *end;
+  if (deli != nullptr)
+    g_config.delimiter = (uint8_t)std::strtoul(deli, &end, 16);
 
-  // auto *skipEpisodeNum = getenv("MAZERUNNER_SKIP_EPISODE_NUM");
-  // if (skipEpisodeNum != nullptr)
-  //   g_config.skipEpisodeNum = (skipEpisodeNum);
+  auto *skipEpisodeNum = getenv("MAZERUNNER_SKIP_EPISODE_NUM");
+  if (skipEpisodeNum != nullptr)
+    g_config.skipEpisodeNum = std::stoi(skipEpisodeNum);
 
-  // auto *targetBA = getenv("MAZERUNNER_TARGET_BRANCHACTION");
-  // if (targetBA != nullptr)
-  //   g_config.targetBA = (targetBA);
+  auto *targetBA = getenv("MAZERUNNER_TARGET_BRANCH_ACTION");
+  if (targetBA != nullptr)
+    g_config.targetBA = targetBA;
 
-  // auto *pkglen = getenv("MAZERUNNER_PACKAGE_LENGTH");
-  // if (pkglen != nullptr)
-  //   g_config.pkglen = (pkglen);
+  auto *pkglen = getenv("MAZERUNNER_PACKAGE_LENGTH");
+  if (pkglen != nullptr)
+    g_config.pkglen = std::stoi(pkglen);
 
-  // auto *dbNum = getenv("MAZERUNNER_redis_dbNum");
-  // if (dbNum != nullptr)
-  //   g_config.dbNum = dbNum;
+  auto *dbNum = getenv("MAZERUNNER_redis_dbNum");
+  if (dbNum != nullptr)
+    g_config.dbNum = std::stoi(dbNum);
 
   auto *fullyConcrete = getenv("SYMCC_NO_SYMBOLIC_INPUT");
   if (fullyConcrete != nullptr)
