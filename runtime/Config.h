@@ -43,7 +43,7 @@ struct Config {
   std::string inputFile;
 
   /// The file to log constraint solving information to.
-  std::string logFile = "";
+  std::string logFile = "/tmp/output/rl.log";
 
   /// Do we prune expressions on hot paths?
   bool pruning = false;

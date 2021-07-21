@@ -127,9 +127,9 @@ void initialize_CFG() {
 }
 
 void initialize_log(){
-  outfile.open((g_config.outputDir) + "/rl.log", std::ios_base::app);
+  outfile.open(g_config.logFile.c_str(), std::ios_base::app);
   if(!outfile.is_open())
-    LOG_FATAL("Cannot create output file at " + (g_config.outputDir)+ "/rl.log");
+    LOG_FATAL("Cannot create output file at " + g_config.logFile);
 
   if(g_config.skipEpisodeNum < 0 && g_config.targetBA != "follow"){
     outfile << std::endl << "#########################" << std::endl;
@@ -205,7 +205,7 @@ void _sym_initialize(void) {
 
   loadConfig();
   initLibcWrappers();
-  std::cerr << "This is SymCC running with the QSYM backend" << std::endl;
+  std::cerr << "This is SymCC running with the MAZERUNNER backend" << std::endl;
   if (g_config.fullyConcrete) {
     std::cerr
         << "Performing fully concrete execution (i.e., without symbolic input)"
