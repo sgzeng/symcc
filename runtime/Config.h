@@ -17,12 +17,24 @@
 
 #include <string>
 
+#define SOURCE_STDIN 0
+#define SOURCE_FILE 1
+#define SOURCE_NET 2
+
 struct Config {
   /// delimiter to seperate packages from the whole input
   uint8_t delimiter = 0x0a;
 
   /// how many episodes to skip
   int skipEpisodeNum = 0;
+
+  /*
+  * input source type
+  * 0: stdin
+  * 1: file stream
+  * 2: network socket
+  */
+ int inputSource = SOURCE_STDIN;
 
   // redis db numer
   int dbNum = 0;

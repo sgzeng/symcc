@@ -34,9 +34,8 @@
 #define SYM(x) x##_symbolized
 
 typedef uint64_t UINT64;            ///< 64-bit unsigned integer
-UINT64       currOffset;
 
-namespace {
+namespace qsym {
 
 /// The file descriptor referring to the symbolic input.
 int inputFileDescriptor = -1;
@@ -61,16 +60,17 @@ void tryAlternative(E *value, SymExpr valueExpr, F caller) {
   tryAlternative(reinterpret_cast<intptr_t>(value), valueExpr, caller);
 }
 } // namespace
+using namespace qsym;
 
 void initLibcWrappers() {
   if (g_config.fullyConcrete)
     return;
 
-  if (g_config.inputFile.empty()) {
+  if (g_config.inputFile.empty() && g_config.inputSource != SOURCE_NET) {
     // Symbolic data comes from standard input.
     inputFileDescriptor = 0;
   }
-  currOffset = 0;
+  inputOffset = 0;
 }
 
 extern "C" {
@@ -117,7 +117,7 @@ int SYM(open)(const char *path, int oflag, mode_t mode) {
   _sym_set_return_expression(nullptr);
 
   if (result >= 0 && !g_config.fullyConcrete && !g_config.inputFile.empty() &&
-      strstr(path, g_config.inputFile.c_str()) != nullptr) {
+      strstr(path, g_config.inputFile.c_str()) != nullptr && g_config.inputSource != SOURCE_NET) {
     if (inputFileDescriptor != -1)
       std::cerr << "Warning: input file opened multiple times; this is not yet "
                    "supported"
@@ -134,7 +134,7 @@ int SYM(accept)(int sockfd, struct sockaddr* addr, socklen_t* addrlen) {
   _sym_set_return_expression(nullptr);
 
   // std::cout << "intercepting accept \n";
-  if (result >= 0 && !g_config.fullyConcrete && !g_config.inputFile.empty()){
+  if (result >= 0 && !g_config.fullyConcrete && !g_config.inputFile.empty() && g_config.inputSource == SOURCE_NET){
     if (inputFileDescriptor != -1)
       std::cerr << "Warning: input file opened multiple times; this is not yet "
                    "supported"
@@ -152,7 +152,7 @@ int SYM(accept4)(int sockfd, struct sockaddr* addr, socklen_t* addrlen, int flag
   _sym_set_return_expression(nullptr);
 
   // std::cout << "intercepting accept4 \n";
-  if (result >= 0 && !g_config.fullyConcrete && !g_config.inputFile.empty()){
+  if (result >= 0 && !g_config.fullyConcrete && !g_config.inputFile.empty() && g_config.inputSource == SOURCE_NET){
     if (inputFileDescriptor != -1)
       std::cerr << "Warning: input file opened multiple times; this is not yet "
                    "supported"
@@ -184,7 +184,6 @@ ssize_t SYM(recv)(int sockfd, void *buf, size_t len, int flags) {
     ReadWriteShadow shadow(buf, result);
     std::fill(shadow.begin(), shadow.end(), nullptr);
   }
-  currOffset += (UINT64)result;
   return result;
 }
 
@@ -209,7 +208,6 @@ ssize_t SYM(recvfrom)(int sockfd, void* buf, size_t len, int flags, struct socka
     ReadWriteShadow shadow(buf, result);
     std::fill(shadow.begin(), shadow.end(), nullptr);
   }
-  currOffset += (UINT64)result;
   return result;
 }
 
@@ -218,7 +216,6 @@ ssize_t SYM(recvmsg)(int sockfd, struct msghdr *msg, int flags) {
   exit(-1);
 
   auto result = recvmsg(sockfd, msg, flags);
-  currOffset += (UINT64)result;
   return result;
 }
 
@@ -242,7 +239,6 @@ ssize_t SYM(read)(int fildes, void *buf, size_t nbyte) {
     ReadWriteShadow shadow(buf, result);
     std::fill(shadow.begin(), shadow.end(), nullptr);
   }
-  currOffset += (UINT64)result;
   return result;
 }
 
@@ -302,7 +298,6 @@ FILE *SYM(fopen)(const char *pathname, const char *mode) {
     inputFileDescriptor = fileno(result);
     inputOffset = 0;
   }
-
   return result;
 }
 
@@ -341,7 +336,6 @@ size_t SYM(fread)(void *ptr, size_t size, size_t nmemb, FILE *stream) {
     ReadWriteShadow shadow(ptr, result * size);
     std::fill(shadow.begin(), shadow.end(), nullptr);
   }
-
   return result;
 }
 
@@ -361,7 +355,6 @@ char *SYM(fgets)(char *str, int n, FILE *stream) {
     ReadWriteShadow shadow(str, sizeof(char) * strlen(str));
     std::fill(shadow.begin(), shadow.end(), nullptr);
   }
-
   return result;
 }
 

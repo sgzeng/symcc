@@ -50,6 +50,10 @@ void loadConfig() {
   if (skipEpisodeNum != nullptr)
     g_config.skipEpisodeNum = std::stoi(skipEpisodeNum);
 
+  auto *inputSource = getenv("MAZERUNNER_INPUT_SOURCE");
+  if (inputSource != nullptr)
+    g_config.inputSource = std::stoi(inputSource);
+
   auto *targetBA = getenv("MAZERUNNER_TARGET_BRANCH_ACTION");
   if (targetBA != nullptr)
     g_config.targetBA = targetBA;
