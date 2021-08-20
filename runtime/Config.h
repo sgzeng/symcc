@@ -34,7 +34,7 @@ struct Config {
   * 1: file stream
   * 2: network socket
   */
- int inputSource = SOURCE_STDIN;
+  int inputSource = -1;
 
   // redis db numer
   int dbNum = 0;

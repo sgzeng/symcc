@@ -131,9 +131,7 @@ void initialize_log(){
   if(!outfile.is_open())
     LOG_FATAL("Cannot create output file at " + g_config.logFile);
 
-  if(g_config.skipEpisodeNum < 0 && g_config.targetBA != "follow"){
-    outfile << std::endl << "#########################" << std::endl;
-  }
+  outfile << std::endl << "#########################" << std::endl;
 }
 
 void initialize_redis(){
@@ -205,6 +203,9 @@ void _sym_initialize(void) {
 
   loadConfig();
   initLibcWrappers();
+  initialize_log();
+  initialize_CFG();
+  initialize_redis();
   std::cerr << "This is SymCC running with the MAZERUNNER backend" << std::endl;
   if (g_config.fullyConcrete) {
     std::cerr
@@ -254,9 +255,6 @@ void _sym_initialize(void) {
     std::cerr << "Making data read from " << inputFileName << " as symbolic"
               << std::endl;
   }
-  initialize_log();
-  initialize_CFG();
-  initialize_redis();
   g_z3_context = new z3::context{};
   g_solver = new Solver(inputFileName, g_config.outputDir, g_config.aflCoverageMap, g_config.delimiter, g_config.skipEpisodeNum, g_config.targetBA, g_config.pkglen);
   g_expr_builder = g_config.pruning ? PruneExprBuilder::create()
@@ -436,7 +434,6 @@ UNSUPPORTED(SymExpr _sym_build_float_to_unsigned_integer(SymExpr, uint8_t))
 //
 // Call-stack tracing
 //
-
 void _sym_notify_call(uintptr_t ret_addr, uintptr_t target_addr) {
   g_call_stack_manager.visitCall(ret_addr, target_addr);
 }
