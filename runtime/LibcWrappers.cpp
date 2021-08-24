@@ -29,6 +29,7 @@
 #include "Config.h"
 #include "Shadow.h"
 #include <Runtime.h>
+#include <solver.h>
 // #include "LibcWrappers.h"
 
 #define SYM(x) x##_symbolized
@@ -36,6 +37,8 @@
 typedef uint64_t UINT64;            ///< 64-bit unsigned integer
 
 namespace qsym {
+
+extern Solver *g_solver;
 
 /// The file descriptor referring to the symbolic input.
 int inputFileDescriptor = -1;
@@ -74,6 +77,14 @@ void initLibcWrappers() {
 }
 
 extern "C" {
+
+//
+// lean, colloct and clean before exit
+//
+void *SYM(exit)(int code){
+  g_solver->rl_clean();
+}
+
 
 void *SYM(malloc)(size_t size) {
   auto *result = malloc(size);

@@ -130,8 +130,9 @@ void initialize_log(){
   outfile.open(g_config.logFile.c_str(), std::ios_base::app);
   if(!outfile.is_open())
     LOG_FATAL("Cannot create output file at " + g_config.logFile);
-
-  outfile << std::endl << "#########################" << std::endl;
+  if(g_config.skipEpisodeNum < 0){
+    outfile << std::endl << "#########################" << std::endl;
+  }
 }
 
 void initialize_redis(){
