@@ -26,7 +26,7 @@ struct Config {
   uint8_t delimiter = 0x0a;
 
   /// how many episodes to skip
-  int skipEpisodeNum = 0;
+  int skipEpisodeNum = -1;
 
   /*
   * input source type

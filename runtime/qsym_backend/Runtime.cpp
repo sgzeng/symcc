@@ -444,6 +444,8 @@ void _sym_notify_ret(uintptr_t site_id) {
 }
 
 void _sym_notify_basic_block(uintptr_t site_id) {
+  // for debug
+  // outfile << "0x"+hexstr(site_id) << std::endl;
   if(std::find(error_pc_list.begin(), error_pc_list.end(), site_id) != error_pc_list.end()){
     g_solver->error_punishment = PUNISHMENT_REWARD;
   }

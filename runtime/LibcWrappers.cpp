@@ -81,8 +81,9 @@ extern "C" {
 //
 // lean, colloct and clean before exit
 //
-void *SYM(exit)(int code){
+void SYM(exit)(int code){
   g_solver->rl_clean();
+  return;
 }
 
 
